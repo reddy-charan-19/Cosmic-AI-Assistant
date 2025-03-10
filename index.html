@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+    /* Cosmic Color Scheme */
+    :root {
+        --space-black: #0a0e17;
+        --neon-purple: #bc13fe;
+        --electric-blue: #00f3ff;
+        --stardust-yellow: #ffd700;
+        --plasma-pink: #ff007f;
+        --void-black: #000000;
+        --galaxy-gradient: linear-gradient(
+            45deg,
+            var(--neon-purple),
+            var(--electric-blue),
+            var(--plasma-pink)
+        );
+    }
+
+    body {
+        background: var(--space-black);
+        color: white;
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .cosmic-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 50% 50%,
+            rgba(188, 19, 254, 0.1) 0%,
+            rgba(0, 243, 255, 0.05) 50%,
+            rgba(0, 0, 0, 0.8) 100%
+        );
+        z-index: -1;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .header h1 {
+        font-size: 4rem;
+        background: var(--galaxy-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(188, 19, 254, 0.4);
+        animation: cosmicGlow 4s ease-in-out infinite;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        justify-content: center;
+    }
+
+    .tab-btn {
+        padding: 1.2rem 2.5rem;
+        border: none;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--galaxy-gradient);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tab-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(0, 243, 255, 0.2);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(
+            45deg,
+            rgba(188, 19, 254, 0.3),
+            rgba(0, 243, 255, 0.3)
+        );
+        border: 1px solid var(--electric-blue);
+    }
+
+    .feature-section {
+        background: rgba(10, 14, 23, 0.9);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 243, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 243, 255, 0.1);
+        position: relative;
+        display: none;
+    }
+
+    .feature-section::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: var(--galaxy-gradient);
+        z-index: -1;
+        border-radius: 22px;
+        animation: borderFlow 6s linear infinite;
+    }
+
+    .feature-section.active {
+        display: block;
+        animation: sectionAppear 0.6s ease-out;
+    }
+
+    .chat-history {
+        height: 500px;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(0, 243, 255, 0.1);
+    }
+
+    .message {
+        margin-bottom: 1.5rem;
+        padding: 1.2rem;
+        border-radius: 15px;
+        max-width: 80%;
+        position: relative;
+        backdrop-filter: blur(5px);
+        animation: messageFloat 3s ease-in-out infinite;
+    }
+
+    .user-message {
+        background: linear-gradient(
+            45deg,
+            rgba(0, 243, 255, 0.15),
+            rgba(188, 19, 254, 0.15)
+        );
+        margin-left: auto;
+        border: 1px solid var(--electric-blue);
+        box-shadow: 0 4px 15px rgba(0, 243, 255, 0.1);
+    }
+
+    .bot-message {
+        background: linear-gradient(
+            45deg,
+            rgba(10, 14, 23, 0.9),
+            rgba(0, 243, 255, 0.1)
+        );
+        border: 1px solid var(--neon-purple);
+        box-shadow: 0 4px 15px rgba(188, 19, 254, 0.1);
+        animation: messageEnter 0.4s ease-out;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        position: relative;
+    }
+
+    input, textarea, select {
+        flex: 1;
+        padding: 1.2rem;
+        border: none;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
+        font-size: 1rem;
+        border: 1px solid var(--electric-blue);
+        transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+    }
+
+    button {
+        padding: 1.2rem 2.5rem;
+        border: none;
+        border-radius: 12px;
+        background: var(--galaxy-gradient);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--electric-blue);
+    }
+
+    button::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            45deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transform: rotate(45deg);
+        animation: buttonShine 3s infinite;
+    }
+
+    .image-preview {
+        max-width: 100%;
+        margin-top: 2rem;
+        border-radius: 15px;
+        border: 2px solid var(--neon-purple);
+        box-shadow: 0 8px 32px rgba(188, 19, 254, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .image-preview:hover {
+        transform: scale(1.02) rotate(1deg);
+    }
+
+    /* Animations */
+    @keyframes cosmicGlow {
+        0%, 100% { text-shadow: 0 0 30px rgba(188, 19, 254, 0.4); }
+        50% { text-shadow: 0 0 50px rgba(0, 243, 255, 0.6); }
+    }
+
+    @keyframes borderFlow {
+        0% { opacity: 0.3; }
+        50% { opacity: 0.7; }
+        100% { opacity: 0.3; }
+    }
+
+    @keyframes sectionAppear {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes messageEnter {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes buttonShine {
+        to { transform: translateX(100%) rotate(45deg); }
+    }
+
+    /* Particle Animation */
+    .particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+        }
+
+        .tabs {
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .chat-history {
+            height: 60vh;
+        }
+    }
+        /* Add mic button styles */
+        .mic-btn {
+    padding: 1rem;
+    border-radius: 50%;
+    background: var(--galaxy-gradient);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--electric-blue);
+}
+
+.mic-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px var(--neon-purple);
+}
+
+        /* Voice Settings Styles */
+        .voice-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .voice-option {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .voice-preview {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .range-slider {
+            width: 100%;
+            accent-color: var(--neon-purple);
+        }
+</style>
+
+<!-- Add particles container before </body> -->
+<canvas class="particles"></canvas>
+
+<script>
+    // Add particle animation
+    const canvas = document.querySelector('.particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const particleCount = 100;
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 1;
+            this.speedX = Math.random() * 3 - 1.5;
+            this.speedY = Math.random() * 3 - 1.5;
+            this.color = hsl(${Math.random() * 360}, 100%, 70%);
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            if (this.x > canvas.width + 20 || this.x < -20) this.reset();
+            if (this.y > canvas.height + 20 || this.y < -20) this.reset();
+        }
+
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        ctx.fillStyle = 'rgba(10, 14, 23, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw();
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+    </style>
+</head>
+<body>
+    <div class="cosmic-bg"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1>🪐 Cosmic AI</h1>
+            <p>Your Universal Intelligence Companion</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="chat">💬 Chat</button>
+            <button class="tab-btn" data-tab="voice">🎙 Voice</button>
+            <button class="tab-btn" data-tab="image">🖼 Image</button>
+            <button class="tab-btn" data-tab="translate">🌐 Translate</button>
+        </nav>
+
+        <main>
+           <!-- Chat Section -->
+<section class="feature-section active" id="chat">
+    <div class="chat-container">
+        <div class="chat-history" id="chatHistory">
+            <div class="message bot-message">Hello! How can I assist you today?</div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+            <button class="mic-btn" onclick="startSpeechRecognition()">🎤</button>
+        </div>
+    </div>
+</section>
+
+<!-- Voice Settings Section -->
+<section class="feature-section" id="voice">
+    <h2>Voice Settings</h2>
+    <div class="voice-controls">
+        <div class="voice-option">
+            <h3>Voice Type</h3>
+            <select id="voiceSelect" class="cosmic-select">
+                <option value="sweet">Sweet Female Voice</option>
+                <option value="normal">Normal Voice</option>
+                <option value="deep">Deep Motivational Voice</option>
+            </select>
+        </div>
+        
+        <div class="voice-option">
+            <h3>Speech Rate</h3>
+            <input type="range" id="rate" class="range-slider" min="0.5" max="2" value="1" step="0.1">
+            <span id="rateValue">1.0</span>
+        </div>
+
+        <div class="voice-option">
+            <h3>Voice Preview</h3>
+            <div class="voice-preview">
+                <input type="text" id="previewText" value="Hello, I am Cosmic AI" class="cosmic-input">
+                <button onclick="previewVoice()" class="cosmic-btn">Play</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+            <!-- Image Section -->
+            <section class="feature-section" id="image">
+                <h2>Image Generation</h2>
+                <div class="input-group">
+                    <input type="text" id="imagePrompt" 
+                           placeholder="Describe the image you want to generate...">
+                    <button onclick="generateImage()">Generate</button>
+                </div>
+                <figure>
+                    <img class="image-preview" id="generatedImage" 
+                         alt="Generated image preview"
+                         loading="lazy">
+                </figure>
+            </section>
+
+            <!-- Translate Section -->
+            <section class="feature-section" id="translate">
+                <h2>Translation</h2>
+                <div class="input-group">
+                    <textarea id="translateText" 
+                              placeholder="Enter text to translate..."></textarea>
+                    <select id="targetLanguage">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="hi">Hindi</option>
+                        <option value="te">Telugu</option>
+                        <option value="de">German</option>
+<option value="it">Italian</option>
+<option value="ru">Russian</option>
+<option value="pt">Portuguese</option>
+<option value="zh-CN">Chinese (Simplified)</option>
+<option value="zh-TW">Chinese (Traditional)</option>
+<option value="ja">Japanese</option>
+<option value="ko">Korean</option>
+<option value="ar">Arabic</option>
+<option value="nl">Dutch</option>
+<option value="el">Greek</option>
+<option value="tr">Turkish</option>
+<option value="sv">Swedish</option>
+<option value="pl">Polish</option>
+<option value="cs">Czech</option>
+<option value="ro">Romanian</option>
+<option value="hu">Hungarian</option>
+<option value="da">Danish</option>
+<option value="fi">Finnish</option>
+<option value="no">Norwegian</option>
+<option value="th">Thai</option>
+<option value="vi">Vietnamese</option>
+<option value="id">Indonesian</option>
+<option value="ms">Malay</option>
+<option value="bn">Bengali</option>
+<option value="ta">Tamil</option>
+<option value="gu">Gujarati</option>
+<option value="pa">Punjabi</option>
+<option value="ur">Urdu</option>
+<option value="mr">Marathi</option>
+<option value="kn">Kannada</option>
+<option value="ne">Nepali</option>
+<option value="si">Sinhala</option>
+<option value="he">Hebrew</option>
+<option value="fa">Persian</option>
+<option value="sw">Swahili</option>
+<option value="zu">Zulu</option>
+                        
+                    </select>
+                    <button onclick="translateText()">Translate</button>
+                </div>
+                <div class="translation-result" id="translationResult"></div>
+            </section>
+              <!-- New Voice Settings Section -->
+              <section class="feature-section" id="voice">
+                <h2>Voice Settings</h2>
+                <div class="voice-controls">
+                    <div class="voice-option">
+                        <h3>Voice Type</h3>
+                        <select id="voiceSelect" class="cosmic-select">
+                            <option value="">Default</option>
+                        </select>
+                    </div>
+                    
+                    <div class="voice-option">
+                        <h3>Speech Rate</h3>
+                        <input type="range" id="rate" class="range-slider" min="0.5" max="2" value="1" step="0.1">
+                        <span id="rateValue">1.0</span>
+                    </div>
+
+                    <div class="voice-option">
+                        <h3>Voice Preview</h3>
+                        <div class="voice-preview">
+                            <input type="text" id="previewText" value="Hello, I am Cosmic AI" class="cosmic-input">
+                            <button onclick="previewVoice()" class="cosmic-btn">Play</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab Switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn, .feature-section').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Chat Functionality
+            window.sendMessage = async () => {
+                const input = document.getElementById('userInput');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const chatHistory = document.getElementById('chatHistory');
+                
+                // Add user message
+                chatHistory.innerHTML += `
+                    <div class="message user-message">${text}</div>
+                    <div class="message bot-message">Processing...</div>
+                `;
+
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
+                    
+                    const data = await response.json();
+                    const botMessages = document.querySelectorAll('.bot-message');
+                    const lastBotMessage = botMessages[botMessages.length - 1];
+                    
+                    if (data.status === 'success') {
+                        lastBotMessage.textContent = data.response;
+                    } else {
+                        lastBotMessage.textContent = 'Error processing request';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    lastBotMessage.textContent = 'Connection error';
+                }
+
+                input.value = '';
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            };
+
+            // Image Generation
+            window.generateImage = async () => {
+                const prompt = document.getElementById('imagePrompt').value.trim();
+                if (!prompt) return;
+
+                const imgElement = document.getElementById('generatedImage');
+                imgElement.src = '';
+                
+                try {
+                    const response = await fetch('/generate-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt })
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        imgElement.src = URL.createObjectURL(blob);
+                    } else {
+                        alert('Image generation failed');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Connection error');
+                }
+            };
+
+            // Translation
+            window.translateText = async () => {
+                const text = document.getElementById('translateText').value.trim();
+                const targetLang = document.getElementById('targetLanguage').value;
+                
+                if (!text) return;
+
+                try {
+                    const response = await fetch('/translate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            text,
+                            target_lang: targetLang 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    const resultDiv = document.getElementById('translationResult');
+                    
+                    if (data.status === 'success') {
+                        resultDiv.textContent = data.translation;
+                    } else {
+                        resultDiv.textContent = 'Translation failed';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('translationResult').textContent = 
+                        'Connection error';
+                }
+            };
+        });
+
+         // Voice Synthesis Setup
+        voices = [];
+        let currentVoice = null;
+
+     // Speech Recognition
+function startSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Speech recognition not supported in this browser.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userInput').value = transcript;
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+    };
+
+    recognition.start();
+}
+
+// Text-to-Speech with Voice Levels
+function speakText(text) {
+    if (synth.speaking) synth.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voiceType = document.getElementById('voiceSelect').value;
+
+    // Set voice based on selected type
+    if (voiceType === 'sweet') {
+        utterance.voice = voices.find(voice => voice.name.toLowerCase().includes('female'));
+    } else if (voiceType === 'deep') {
+        utterance.voice = voices.find(voice => voice.name.toLowerCase().includes('male'));
+    } else {
+        utterance.voice = voices[0]; // Default voice
+    }
+
+    utterance.rate = document.getElementById('rate').value;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    synth.speak(utterance);
+}
+
+// Modified sendMessage to include TTS
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chatHistory = document.getElementById('chatHistory');
+    
+    // Add user message
+    chatHistory.innerHTML += `
+        <div class="message user-message">${text}</div>
+        <div class="message bot-message">Processing...</div>
+    `;
+
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        const botMessages = document.querySelectorAll('.bot-message');
+        const lastBotMessage = botMessages[botMessages.length - 1];
+        
+        if (data.status === 'success') {
+            lastBotMessage.textContent = data.response;
+            speakText(data.response); // Speak the bot's response
+        } else {
+            lastBotMessage.textContent = 'Error processing request';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        lastBotMessage.textContent = 'Connection error';
+    }
+
+    input.value = '';
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+// Range Slider Update
+document.getElementById('rate').addEventListener('input', (e) => {
+    document.getElementById('rateValue').textContent = e.target.value;
+});
+
+
+// Initialize Speech Synthesis
+let synth = window.speechSynthesis;
+let voices = [];
+
+// Populate voices
+function populateVoices() {
+    voices = synth.getVoices();
+    const voiceSelect = document.getElementById('voiceSelect');
+    voiceSelect.innerHTML = '';
+    
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name;
+        option.textContent = ${voice.name} (${voice.lang});
+        voiceSelect.appendChild(option);
+    });
+}
+
+// Wait for voices to be loaded
+synth.onvoiceschanged = populateVoices;
+
+// Speak text function
+function speakText() {
+            const text = document.getElementById("textInput").value;
+            
+            if (text === "") {
+                alert("Please enter some text to speak.");
+                return;
+            }
+
+            // Create a new SpeechSynthesisUtterance object with the text
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set the voice, pitch, and rate (optional)
+            utterance.pitch = 1;  // Normal pitch
+            utterance.rate = 1;   // Normal speed
+
+            // Speak the text
+            window.speechSynthesis.speak(utterance);
+
+    // Set speech parameters
+    utterance.rate = document.getElementById('rate').value;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    synth.speak(utterance);
+}
+
+// Modified sendMessage to include TTS
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chatHistory = document.getElementById('chatHistory');
+    
+    // Add user message
+    chatHistory.innerHTML += `
+        <div class="message user-message">${text}</div>
+        <div class="message bot-message">Processing...</div>
+    `;
+
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        const botMessages = document.querySelectorAll('.bot-message');
+        const lastBotMessage = botMessages[botMessages.length - 1];
+        
+        if (data.status === 'success') {
+            lastBotMessage.textContent = data.response;
+            speakText(data.response); // Speak the bot's response
+        } else {
+            lastBotMessage.textContent = 'Error processing request';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        lastBotMessage.textContent = 'Connection error';
+    }
+
+    input.value = '';
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+// Wait for voices to be loaded
+synth.onvoiceschanged = populateVoices;
+
+function speakText(text) {
+    console.log("Speaking text:", text); // Debugging line
+    if (synth.speaking) synth.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    const selectedVoice = document.getElementById('voiceSelect').value;
+    
+    const voice = voices.find(v => v.name === selectedVoice);
+    if (voice) {
+        utterance.voice = voice;
+    }
+
+    utterance.rate = document.getElementById('rate').value;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    synth.speak(utterance);
+}
+
+function previewVoice() {
+    const text = document.getElementById('previewText').value;
+    if (text.trim() === '') return;
+    
+    // Ensure voices are loaded
+    if (voices.length === 0) {
+        populateVoices();
+        setTimeout(() => speakText(text), 100);
+    } else {
+        speakText(text);
+    }
+}
+
+// Range Slider Update
+document.getElementById('rate').addEventListener('input', (e) => {
+    document.getElementById('rateValue').textContent = e.target.value;
+});
+
+// Initial population of voices when page loads
+setTimeout(populateVoices, 100);
+        // Modified sendMessage to include TTS
+        async function sendMessage() {
+            // Existing sendMessage code...
+            
+            // After receiving bot response:
+            const botMessages = document.querySelectorAll('.bot-message');
+            const lastBotMessage = botMessages[botMessages.length - 1];
+            speakText(lastBotMessage.textContent);
+        }
+
+        // Range Slider Update
+        document.getElementById('rate').addEventListener('input', (e) => {
+            document.getElementById('rateValue').textContent = e.target.value;
+        });
+
+        // Rest of existing JavaScript remains same
+    </script>
+</body>
+</html>
